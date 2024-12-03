@@ -95,9 +95,10 @@ internal static class Problem
         var enStr = "do()";
         var disabledStr = "don't()";
 
-        var enIdx = input[0..i].LastIndexOf(enStr);
-        var disIdx = input[0..i].LastIndexOf(disabledStr);
+        var idxss=GetNextValidStartEnd(input, i);
 
+        var enIdx = input[0..idxss.Item1].LastIndexOf(enStr);
+        var disIdx = input[0..idxss.Item1].LastIndexOf(disabledStr);
         if (enIdx < 0 && disIdx < 0) {
 
             return true;
@@ -159,9 +160,51 @@ internal static class Problem
         return (firstNr, lastNr);
     }
 
-    public (int, int) GetNextValidStartEnd(string input)
+    public static (int, int) GetNextValidStartEnd(string input, int startIdx)
     {
+        bool found=false;
+        while(startIdx<input.Length && !found){
 
+        var idx = input.IndexOf(mul, startIdx);
+        if (idx < 0)
+        {
+            throw new Exception();
+        }
+
+        var colonIdx = input.IndexOf(",", idx + mul.Length);
+        if (colonIdx < 0)
+        {
+            throw new Exception();
+        }
+        var firstNumber = input[(idx + mul.Length)..colonIdx];
+
+        if (!long.TryParse(firstNumber, out var firstNr))
+        {
+            startIdx = idx + mul.Length;
+        }
+
+        var endIdx = input.IndexOf(")", colonIdx + 1);
+
+        if (endIdx < 0)
+        {
+            throw new Exception();
+        }
+
+        var lastNumber = input[(colonIdx + 1)..endIdx];
+
+        if (!long.TryParse(lastNumber, out var lastNr))
+        {
+            startIdx = idx + mul.Length;
+        }
+        else {
+            found=true;
+        }
+
+if(found){
+    return (idx, endIdx);
+}
+        }
+    return (0,0);
     }
     private static (long, long)? GetPairStartingIdx(string input, ref int startIdx)
     {
